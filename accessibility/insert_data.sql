@@ -1,53 +1,49 @@
-USE Project_User;
+USE PenguinWebsite;
 
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/camera.csv'
+LOAD DATA INFILE '/home/jeoker/Documents/database/project/PenguinWebsite/data/camera.csv'
   INTO TABLE Camera
   FIELDS TERMINATED BY ',' 
   ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 0 ROWS;
 
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/site.csv'
+LOAD DATA INFILE '/home/jeoker/Documents/database/project/PenguinWebsite/data/site.csv'
   INTO TABLE Site
   FIELDS TERMINATED BY ',' 
   ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 0 ROWS;
 
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/image.csv'
+LOAD DATA INFILE '/home/jeoker/Documents/database/project/PenguinWebsite/data/image.csv'
   INTO TABLE Image
-  FIELDS TERMINATED BY ',' 
+  FIELDS TERMINATED BY ','
   ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
-  IGNORE 0 ROWS
-  (idImage,fname,ftype,siteID,mediaLink,size,@vtimestamp,@vwidth,@vheight,@vlongitude,@vlatitude,camID)
+  (idImage,fname,ftype,siteID,mediaLink,size,@vtimestamp,@vwidth,@vheight,@vlongitude,@vlatitude,idCam)
   SET
   timestamp = NULLIF(@vtimestamp,'0'),
   width = NULLIF(@vwidth,'0'),
   height = NULLIF(@vheight,'0'),
   longitude = NULLIF(@vlongitude,'0'),
   latitude = NULLIF(@vlatitude,'0');
-  
+
   
 
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/label.csv'
+LOAD DATA INFILE '/home/jeoker/Documents/database/project/PenguinWebsite/data/label.csv'
   INTO TABLE Annotation
   FIELDS TERMINATED BY ',' 
   ENCLOSED BY '"'
   LINES TERMINATED BY '\n'
   IGNORE 0 ROWS;
 
-insert into UAV(model,camID,weight)
-  values("DJI Mavic Air",1,430),("Phantom 3 Professional",3,1280),("DJI Mavic 2 Pro",4,907);
+insert into UAV(model,idCam,weight)
+  values("DJI Mavic Air",1,430),("Phantom 3 Professional",2,1280),("DJI Mavic 2 Pro",3,907);
 
 insert into Model(name,createTime)
   values("withoutChick0","2020:05:28 12:00:00");
 
-insert into Detection(imageID,totalCount,pathOnCloud,modelID)
+insert into Detection(idImage,totalCount,pathOnCloud,idModel)
   values(1524,55,"xxx",1);
-
-
-
 
 
 #INSERT USER
@@ -122,7 +118,7 @@ INSERT INTO LikeOrDislike(UserKeyFK,CommentKeyFK,LikeOrDislike)
 VALUES('3','3','0');
 
 #INSERT Participate
-INSERT INTO Participate(idSiteFK,researcherKeyFK)
+INSERT INTO Participate(idSiteFK,idResearcherFK)
 VALUES('1','1'),
 ('2','1'),
 ('3','1'),
@@ -156,41 +152,15 @@ VALUES('1','1'),
 ('31','5');
 
 
-
-
-
-
-
-
-
-
-
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/weather/2015(-54,-63).csv' INTO TABLE Weather
- FIELDS TERMINATED BY ',' 
- LINES TERMINATED BY '\n'
- IGNORE 1 LINES;
- 
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/weather/2015(-59,-62).csv' INTO TABLE Weather
- FIELDS TERMINATED BY ',' 
- LINES TERMINATED BY '\n'
- IGNORE 1 LINES;
- 
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/weather/2018(-54,-63).csv' INTO TABLE Weather
- FIELDS TERMINATED BY ',' 
- LINES TERMINATED BY '\n'
- IGNORE 1 LINES;
- 
-LOAD DATA INFILE '/home/jeoker/Documents/database/project/weather/2018(-59,-62).csv' INTO TABLE Weather
- FIELDS TERMINATED BY ',' 
- LINES TERMINATED BY '\n'
- IGNORE 1 LINES;
- 
- LOAD DATA INFILE '/home/jeoker/Documents/database/project/weather/2019(-54,-63).csv' INTO TABLE Weather
- FIELDS TERMINATED BY ',' 
- LINES TERMINATED BY '\n'
- IGNORE 1 LINES;
- 
- LOAD DATA INFILE '/home/jeoker/Documents/database/project/weather/2019(-59,-62).csv' INTO TABLE Weather
- FIELDS TERMINATED BY ',' 
- LINES TERMINATED BY '\n'
- IGNORE 1 LINES;
+LOAD DATA INFILE '/home/jeoker/Documents/database/project/PenguinWebsite/data/weather.csv' INTO TABLE Weather
+    FIELDS TERMINATED BY ','
+    ENCLOSED BY '"'
+    LINES TERMINATED BY '\n'
+    (idWeather,`time`,@vtmpOut,@vtmpH,@vtmpL,@vwindSpeed,windDir,@vwindRun,@vhiSpeed,windChill,bar,heatDD,coolDD,tmpIn,humIn,arcInt,longitude,latitude)
+    SET
+        tmpOut = NULLIF(@vtmpOut,'NA'),
+        tmpH = NULLIF(@vtmpH,'NA'),
+        tmpL = NULLIF(@vtmpL,'NA'),
+        windSpeed = NULLIF(@vwindSpeed,'NA'),
+        windRun = NULLIF(@vwindRun,'NA'),
+        hiSpeed = NULLIF(@vhiSpeed,'NA');
