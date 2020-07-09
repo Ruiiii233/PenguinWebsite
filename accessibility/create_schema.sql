@@ -15,414 +15,379 @@ CREATE SCHEMA IF NOT EXISTS `PenguinWebsite` ;
 USE `PenguinWebsite` ;
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`User`
+-- Table `PenguinWebsite`.`Users`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`User` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Users` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`User` (
-  `UserKey` INT NOT NULL AUTO_INCREMENT,
-  `UserName` VARCHAR(45) NULL,
-  `Password` VARCHAR(45) NULL,
-  `DoB` DATE NULL,
-  `Email` VARCHAR(45) NULL,
-  PRIMARY KEY (`UserKey`))
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Users` (
+    `UserId` INT NOT NULL AUTO_INCREMENT,
+    `UserName` VARCHAR(255) NULL,
+    `Password` VARCHAR(255) NULL,
+    `Status` ENUM("Administrator", "Researcher", "User") NULL,
+    PRIMARY KEY (`UserId`))
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PenguinWebsite`.`Researchers`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PenguinWebsite`.`Researchers` ;
+
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Researchers` (
+    `UserId` INT NOT NULL,
+    `FirstName` VARCHAR(255) NULL,
+    `LastName` VARCHAR(255) NULL,
+    `Gender` TINYINT NULL,
+    `AcademicPaper` LONGTEXT NULL,
+    `Institute` VARCHAR(255) NULL,
+    PRIMARY KEY (`UserId`),
+    INDEX `Researcher_Users1_idx` (`UserId` ASC) VISIBLE,
+    CONSTRAINT `Researcher_Users1`
+        FOREIGN KEY (`UserId`)
+            REFERENCES `PenguinWebsite`.`Users` (`UserId`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PenguinWebsite`.`Posts`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PenguinWebsite`.`Posts` ;
+
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Posts` (
+    `PostId` INT NOT NULL AUTO_INCREMENT,
+    `Title` VARCHAR(255) NOT NULL,
+    `Picture` LONGBLOB NULL,
+    `Content` LONGTEXT NULL,
+    `Published` TINYINT NULL DEFAULT 0,
+    `Created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `UserId` INT NULL,
+    PRIMARY KEY (`PostId`),
+    INDEX `Posts_Users1_idx` (`UserId` ASC) VISIBLE,
+    CONSTRAINT `Posts_Users1`
+        FOREIGN KEY (`UserId`)
+            REFERENCES `PenguinWebsite`.`Users` (`UserId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PenguinWebsite`.`Comments`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PenguinWebsite`.`Comments` ;
+
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Comments` (
+    `CommentId` INT NOT NULL AUTO_INCREMENT,
+    `Content` VARCHAR(255) NOT NULL,
+    `Created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `UserId` INT NULL,
+    `PostId` INT NULL,
+    PRIMARY KEY (`CommentId`),
+    INDEX `Comments_Users1_idx` (`UserId` ASC) VISIBLE,
+    INDEX `Comments_Posts1_idx` (`PostId` ASC) VISIBLE,
+    CONSTRAINT `Comments_Users1`
+        FOREIGN KEY (`UserId`)
+            REFERENCES `PenguinWebsite`.`Users` (`UserId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `Comments_Posts1`
+        FOREIGN KEY (`PostId`)
+            REFERENCES `PenguinWebsite`.`Posts` (`PostId`)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PenguinWebsite`.`Reshares`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PenguinWebsite`.`Reshares` ;
+
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Reshares` (
+    `ReshareId` INT NOT NULL AUTO_INCREMENT,
+    `UserId` INT NULL,
+    `PostId` INT NULL,
+    `CommentId` INT NULL,
+    PRIMARY KEY (`ReshareId`),
+    INDEX `Reshares_Users1_idx` (`UserId` ASC) VISIBLE,
+    INDEX `Reshares_Posts1_idx` (`PostId` ASC) VISIBLE,
+    INDEX `Reshares_Comments1_idx` (`CommentId` ASC) VISIBLE,
+    CONSTRAINT `Reshares_Users1`
+        FOREIGN KEY (`UserId`)
+            REFERENCES `PenguinWebsite`.`Users` (`UserId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `Reshares_Posts1`
+        FOREIGN KEY (`PostId`)
+            REFERENCES `PenguinWebsite`.`Posts` (`PostId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `Reshares_Comments1`
+        FOREIGN KEY (`CommentId`)
+            REFERENCES `PenguinWebsite`.`Comments` (`CommentId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PenguinWebsite`.`Collections`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PenguinWebsite`.`Collections` ;
+
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Collections` (
+    `CollectionId` INT NOT NULL AUTO_INCREMENT,
+    `UserId` INT NULL,
+    `PostId` INT NULL,
+    `CommentId` INT NULL,
+    PRIMARY KEY (`CollectionId`),
+    INDEX `Collections_Users1_idx` (`UserId` ASC) VISIBLE,
+    INDEX `Collections_Posts1_idx` (`PostId` ASC) VISIBLE,
+    INDEX `Collections_Comments1_idx` (`CommentId` ASC) VISIBLE,
+    CONSTRAINT `Collections_Users1`
+        FOREIGN KEY (`UserId`)
+            REFERENCES `PenguinWebsite`.`Users` (`UserId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `Collections_Posts1`
+        FOREIGN KEY (`PostId`)
+            REFERENCES `PenguinWebsite`.`Posts` (`PostId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `Collections_Comments1`
+        FOREIGN KEY (`CommentId`)
+            REFERENCES `PenguinWebsite`.`Comments` (`CommentId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PenguinWebsite`.`Likes`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PenguinWebsite`.`Likes` ;
+
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Likes` (
+    `LikeId` INT NOT NULL AUTO_INCREMENT,
+    `UserId` INT NULL,
+    `PostId` INT NULL,
+    `CommentId` INT NULL,
+    PRIMARY KEY (`LikeId`),
+    INDEX `Likes_Users1_idx` (`UserId` ASC) VISIBLE,
+    INDEX `Likes_Posts1_idx` (`PostId` ASC) VISIBLE,
+    INDEX `Likes_Comments1_idx` (`CommentId` ASC) VISIBLE,
+    CONSTRAINT `Likes_Users1`
+        FOREIGN KEY (`UserId`)
+            REFERENCES `PenguinWebsite`.`Users` (`UserId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `Likes_Posts1`
+        FOREIGN KEY (`PostId`)
+            REFERENCES `PenguinWebsite`.`Posts` (`PostId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `Likes_Comments1`
+        FOREIGN KEY (`CommentId`)
+            REFERENCES `PenguinWebsite`.`Comments` (`CommentId`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PenguinWebsite`.`Cameras`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `PenguinWebsite`.`Cameras` ;
+
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Cameras` (
+  `CameraId` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NULL,
+  PRIMARY KEY (`CameraId`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`Researcher`
+-- Table `PenguinWebsite`.`Sites`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Researcher` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Sites` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Researcher` (
-  `idResearcher` INT NOT NULL AUTO_INCREMENT,
-  `UserKeyFK` INT NOT NULL,
-  `FirstName` VARCHAR(45) NULL,
-  `LastName` VARCHAR(45) NULL,
-  `AcademicPaper` VARCHAR(255) NULL,
-  `Gender` ENUM("M", "F") NULL,
-  `institute` VARCHAR(255) NULL,
-  PRIMARY KEY (`idResearcher`),
-  INDEX `Researcher_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  CONSTRAINT `Researcher_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`Post`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Post` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Post` (
-  `PostKey` INT NOT NULL AUTO_INCREMENT,
-  `UserKeyFK` INT NULL,
-  `Title` VARCHAR(255) NULL,
-  `PostContent` TEXT NULL,
-  `Published` TINYINT NULL,
-  `PostCreated` TIMESTAMP NULL DEFAULT now(),
-  PRIMARY KEY (`PostKey`),
-  INDEX `Post_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  CONSTRAINT `Post_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`NormalUser`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`NormalUser` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`NormalUser` (
-  `NormalUserKey` INT NOT NULL AUTO_INCREMENT,
-  `UserKeyFK` INT NOT NULL,
-  PRIMARY KEY (`NormalUserKey`),
-  INDEX `NormalUser_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  CONSTRAINT `NormalUser_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`Administrator`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Administrator` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Administrator` (
-  `AdministratorKey` INT NOT NULL AUTO_INCREMENT,
-  `UserKeyFK` INT NOT NULL,
-  PRIMARY KEY (`AdministratorKey`),
-  INDEX `Administrator_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  CONSTRAINT `Administrator_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`Comment`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Comment` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Comment` (
-  `CommentKey` INT NOT NULL AUTO_INCREMENT,
-  `UserKeyFK` INT NULL,
-  `PostKeyFK` INT NULL,
-  `CommentContent` TEXT NULL,
-  `CommentCreated` TIMESTAMP NULL DEFAULT now(),
-  PRIMARY KEY (`CommentKey`),
-  INDEX `Comment_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  INDEX `Comment_PostFK1_idx` (`PostKeyFK` ASC) VISIBLE,
-  CONSTRAINT `Comment_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE,
-  CONSTRAINT `Comment_PostFK1`
-    FOREIGN KEY (`PostKeyFK`)
-    REFERENCES `PenguinWebsite`.`Post` (`PostKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`Share`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Share` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Share` (
-  `UserKeyFK` INT NULL,
-  `PostKeyFK` INT NULL,
-  `CommentKeyFK` INT NULL,
-  `ShareCreated` TIMESTAMP NULL DEFAULT now(),
-  INDEX `Share_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  INDEX `Share_PostFK1_idx` (`PostKeyFK` ASC) VISIBLE,
-  INDEX `Share_CommentFK1_idx` (`CommentKeyFK` ASC) VISIBLE,
-  CONSTRAINT `Share_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `Share_PostFK1`
-    FOREIGN KEY (`PostKeyFK`)
-    REFERENCES `PenguinWebsite`.`Post` (`PostKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `Share_CommentFK1`
-    FOREIGN KEY (`CommentKeyFK`)
-    REFERENCES `PenguinWebsite`.`Comment` (`CommentKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`Save`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Save` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Save` (
-  `UserKeyFK` INT NULL,
-  `PostKeyFK` INT NULL,
-  `CommentKeyFK` INT NULL,
-  `SaveCreated` TIMESTAMP NULL DEFAULT now(),
-  INDEX `Save_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  INDEX `Save_PostFK1_idx` (`PostKeyFK` ASC) VISIBLE,
-  INDEX `Save_CommentFK1_idx` (`CommentKeyFK` ASC) VISIBLE,
-  CONSTRAINT `Save_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `Save_PostFK1`
-    FOREIGN KEY (`PostKeyFK`)
-    REFERENCES `PenguinWebsite`.`Post` (`PostKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `Save_CommentFK1`
-    FOREIGN KEY (`CommentKeyFK`)
-    REFERENCES `PenguinWebsite`.`Comment` (`CommentKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`LikeOrDislike`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`LikeOrDislike` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`LikeOrDislike` (
-  `UserKeyFK` INT NULL,
-  `PostKeyFK` INT NULL,
-  `CommentKeyFK` INT NULL,
-  `LikeOrDislike` TINYINT NOT NULL,
-  `LikeOrDislikeCreated` TIMESTAMP NULL DEFAULT now(),
-  INDEX `LikeOrDislike_UserFK1_idx` (`UserKeyFK` ASC) VISIBLE,
-  INDEX `LikeOrDislike_PostFK1_idx` (`PostKeyFK` ASC) VISIBLE,
-  INDEX `LikeOrDislike_CommentFK1_idx` (`CommentKeyFK` ASC) VISIBLE,
-  CONSTRAINT `LikeOrDislike_UserFK1`
-    FOREIGN KEY (`UserKeyFK`)
-    REFERENCES `PenguinWebsite`.`User` (`UserKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `LikeOrDislike_PostFK1`
-    FOREIGN KEY (`PostKeyFK`)
-    REFERENCES `PenguinWebsite`.`Post` (`PostKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `LikeOrDislike_CommentFK1`
-    FOREIGN KEY (`CommentKeyFK`)
-    REFERENCES `PenguinWebsite`.`Comment` (`CommentKey`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`Camera`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Camera` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Camera` (
-  `idCamera` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL,
-  PRIMARY KEY (`idCamera`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PenguinWebsite`.`Site`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Site` ;
-
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Site` (
-  `idSite` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Sites` (
+  `SiteId` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NOT NULL,
   `Date` DATE NOT NULL,
-  PRIMARY KEY (`idSite`))
+  PRIMARY KEY (`SiteId`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`Image`
+-- Table `PenguinWebsite`.`Images`
 -- -----------------------------------------------------
 
-DROP TABLE IF EXISTS `PenguinWebsite`.`Image` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Images` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Image` (
-  `idImage` INT NOT NULL AUTO_INCREMENT,
-  `fname` VARCHAR(45) NOT NULL,
-  `ftype` ENUM("jpg", "png", "tif", "tiff", "dng") NOT NULL,
-  `siteID` INT NULL,
-  `size` INT NULL,
-  `mediaLink` VARCHAR(100) NULL,
-  `timestamp` TIMESTAMP NULL,
-  `width` INT NULL,
-  `height` INT NULL,
-  `longitude` DOUBLE NULL,
-  `latitude` DOUBLE NULL,
-  `idCam` INT NULL,
-  PRIMARY KEY (`idImage`),
-  INDEX `camID_idx` (`idCam` ASC) VISIBLE,
-  INDEX `siteID_idx` (`siteID` ASC) VISIBLE,
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Images` (
+  `ImageId` INT NOT NULL AUTO_INCREMENT,
+  `FileName` VARCHAR(45) NOT NULL,
+  `FileType` ENUM("jpg", "png", "tif", "tiff", "dng") NOT NULL,
+  `SiteId` INT NULL,
+  `Size` INT NULL,
+  `MediaLink` VARCHAR(100) NULL,
+  `TimeStamp` TIMESTAMP NULL,
+  `Width` INT NULL,
+  `Height` INT NULL,
+  `Longitude` DOUBLE NULL,
+  `Latitude` DOUBLE NULL,
+  `CameraId` INT NULL,
+  PRIMARY KEY (`ImageId`),
+  INDEX `camID_idx` (`CameraId` ASC) VISIBLE,
+  INDEX `siteID_idx` (`SiteId` ASC) VISIBLE,
   CONSTRAINT `Image_Cam_fk`
-    FOREIGN KEY (`idCam`)
-    REFERENCES `PenguinWebsite`.`Camera` (`idCamera`)
+    FOREIGN KEY (`CameraId`)
+    REFERENCES `PenguinWebsite`.`Cameras` (`CameraId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
-  CONSTRAINT `siteID`
-    FOREIGN KEY (`siteID`)
-    REFERENCES `PenguinWebsite`.`Site` (`idSite`)
+  CONSTRAINT `SiteId`
+    FOREIGN KEY (`SiteId`)
+    REFERENCES `PenguinWebsite`.`Sites` (`SiteId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`UAV`
+-- Table `PenguinWebsite`.`UAVs`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`UAV` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`UAVs` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`UAV` (
-  `idUAV` INT NOT NULL AUTO_INCREMENT,
-  `model` VARCHAR(45) NOT NULL,
-  `idCam` INT NULL,
-  `weight` FLOAT NOT NULL,
-  PRIMARY KEY (`idUAV`),
-  INDEX `idx_Cam` (`idCam` ASC) VISIBLE,
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`UAVs` (
+  `UavId` INT NOT NULL AUTO_INCREMENT,
+  `Model` VARCHAR(45) NOT NULL,
+  `CameraId` INT NULL,
+  `Weight` FLOAT NOT NULL,
+  PRIMARY KEY (`UavId`),
+  INDEX `idx_Cam` (`CameraId` ASC) VISIBLE,
   CONSTRAINT `fk_Uav_Camera`
-    FOREIGN KEY (`idCam`)
-    REFERENCES `PenguinWebsite`.`Camera` (`idCamera`)
+    FOREIGN KEY (`CameraId`)
+    REFERENCES `PenguinWebsite`.`Cameras` (`CameraId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`Model`
+-- Table `PenguinWebsite`.`Models`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Model` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Models` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Model` (
-  `idModel` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
-  `createTime` TIMESTAMP NOT NULL,
-  PRIMARY KEY (`idModel`))
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Models` (
+  `ModelId` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NOT NULL,
+  `CreateTime` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`ModelId`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`Annotation`
+-- Table `PenguinWebsite`.`Annotations`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Annotation` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Annotations` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Annotation` (
-  `idAnnotation` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NULL,
-  `fileType` ENUM("shp", "json", "xml", "dbf", "prj", "cpg", "shx") NOT NULL,
-  `idSiteFK` INT NULL,
-  `pathOnCloud` VARCHAR(100) NOT NULL,
-  `criteria` ENUM("withChick", "withoutChick") NOT NULL,
-  PRIMARY KEY (`idAnnotation`),
-  INDEX `Annotation_Site_idx` (`idSiteFK` ASC) VISIBLE,
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Annotations` (
+  `AnnotationId` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NULL,
+  `FileType` ENUM("shp", "json", "xml", "dbf", "prj", "cpg", "shx") NOT NULL,
+  `SiteId` INT NULL,
+  `PathOnCloud` VARCHAR(100) NOT NULL,
+  `Criteria` ENUM("withChick", "withoutChick") NOT NULL,
+  PRIMARY KEY (`AnnotationId`),
+  INDEX `Annotation_Site_idx` (`SiteId` ASC) VISIBLE,
   CONSTRAINT `Annotation_Site_fk`
-    FOREIGN KEY (`idSiteFK`)
-    REFERENCES `PenguinWebsite`.`Site` (`idSite`)
+    FOREIGN KEY (`SiteId`)
+    REFERENCES `PenguinWebsite`.`Sites` (`SiteId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`Detection`
+-- Table `PenguinWebsite`.`Detections`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Detection` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Detections` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Detection` (
-  `idDetection` INT NOT NULL AUTO_INCREMENT,
-  `idImage` INT NOT NULL,
-  `totalCount` INT NOT NULL,
-  `pathOnCloud` VARCHAR(99) NOT NULL,
-  `idModel` INT NOT NULL,
-  PRIMARY KEY (`idDetection`),
-  INDEX `idImage_idx` (`idImage` ASC) VISIBLE,
-  INDEX `idModel_idx` (`idModel` ASC) VISIBLE,
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Detections` (
+  `DetectionId` INT NOT NULL AUTO_INCREMENT,
+  `ImageId` INT NOT NULL,
+  `Count` INT NOT NULL,
+  `PathOnCloud` VARCHAR(99) NOT NULL,
+  `ModelId` INT NOT NULL,
+  PRIMARY KEY (`DetectionId`),
+  INDEX `idImage_idx` (`ImageId` ASC) VISIBLE,
+  INDEX `idModel_idx` (`ModelId` ASC) VISIBLE,
   CONSTRAINT `Detection_Image_fk`
-    FOREIGN KEY (`idImage`)
-    REFERENCES `PenguinWebsite`.`Image` (`idImage`)
+    FOREIGN KEY (`ImageId`)
+    REFERENCES `PenguinWebsite`.`Images` (`ImageId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `Detection_Model_fk`
-    FOREIGN KEY (`idModel`)
-    REFERENCES `PenguinWebsite`.`Model` (`idModel`)
+    FOREIGN KEY (`ModelId`)
+    REFERENCES `PenguinWebsite`.`Models` (`ModelId`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`Participate`
+-- Table `PenguinWebsite`.`Participates`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Participate` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Participates` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Participate` (
-  `idParticipate` INT NOT NULL AUTO_INCREMENT,
-  `idSiteFK` INT NULL,
-  `idResearcherFK` INT NULL,
-  PRIMARY KEY (`idParticipate`),
-  INDEX `Participate_Site_fk_idx` (`idSiteFK` ASC) VISIBLE,
-  INDEX `Participate_Researcher_fk_idx` (`idResearcherFK` ASC) VISIBLE,
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Participates` (
+  `ParticipateId` INT NOT NULL AUTO_INCREMENT,
+  `SiteId` INT NULL,
+  `ResearcherId` INT NULL,
+  PRIMARY KEY (`ParticipateId`),
+  INDEX `Participate_Site_fk_idx` (`SiteId` ASC) VISIBLE,
+  INDEX `Participate_Researcher_fk_idx` (`ResearcherId` ASC) VISIBLE,
   CONSTRAINT `fk_Participate_Site`
-    FOREIGN KEY (`idSiteFK`)
-    REFERENCES `PenguinWebsite`.`Site` (`idSite`)
+    FOREIGN KEY (`SiteId`)
+    REFERENCES `PenguinWebsite`.`Sites` (`SiteId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   CONSTRAINT `Participate_Researcher_fk`
-    FOREIGN KEY (`idResearcherFK`)
-    REFERENCES `PenguinWebsite`.`Researcher` (`idResearcher`)
+    FOREIGN KEY (`ResearcherId`)
+    REFERENCES `PenguinWebsite`.`Researchers` (`UserId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PenguinWebsite`.`Weather`
+-- Table `PenguinWebsite`.`Weathers`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Weather` ;
+DROP TABLE IF EXISTS `PenguinWebsite`.`Weathers` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Weather` (
-  `idWeather` INT NOT NULL AUTO_INCREMENT,
-  `time` DATETIME NULL,
-  `tmpOut` FLOAT NULL,
-  `tmpH` FLOAT NULL,
-  `tmpL` FLOAT NULL,
-  `windSpeed` FLOAT NULL,
-  `windDir` VARCHAR(45) NULL,
-  `windRun` FLOAT NULL,
-  `hiSpeed` FLOAT NULL,
-  `windChill` VARCHAR(45) NULL,
-  `bar` VARCHAR(45) NULL,
-  `heatDD` VARCHAR(45) NULL,
-  `coolDD` VARCHAR(45) NULL,
-  `tmpIn` VARCHAR(45) NULL,
-  `humIn` VARCHAR(45) NULL,
-  `arcInt` VARCHAR(45) NULL,
-  `longitude` DOUBLE NULL,
-  `latitude` DOUBLE NULL,
-  PRIMARY KEY (`idWeather`))
+CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Weathers` (
+  `WeatherId` INT NOT NULL AUTO_INCREMENT,
+  `Time` DATETIME NULL,
+  `TmpOut` FLOAT NULL,
+  `TmpH` FLOAT NULL,
+  `TmpL` FLOAT NULL,
+  `WindSpeed` FLOAT NULL,
+  `WindDir` VARCHAR(45) NULL,
+  `WindRun` FLOAT NULL,
+  `HiSpeed` FLOAT NULL,
+  `WindChill` VARCHAR(45) NULL,
+  `Bar` VARCHAR(45) NULL,
+  `HeatDD` VARCHAR(45) NULL,
+  `CoolDD` VARCHAR(45) NULL,
+  `TmpIn` VARCHAR(45) NULL,
+  `HumIn` VARCHAR(45) NULL,
+  `ArcInt` VARCHAR(45) NULL,
+  `Longitude` DOUBLE NULL,
+  `Latitude` DOUBLE NULL,
+  PRIMARY KEY (`WeatherId`))
 ENGINE = InnoDB;
 
 
