@@ -92,15 +92,13 @@ VALUES('2','26 types of penguin: The only list you will ever need','Warning: Hig
 INSERT INTO Comments(UserId,PostId,Content)
 VALUES('3','1','Amazing, they are so beautiful!');
 INSERT INTO Comments(UserId,PostId,Content)
-VALUES('6','1','I like them!!!!');
+VALUES('5','1','I like them!!!!');
 INSERT INTO Comments(UserId,PostId,Content)
 VALUES('3','2','Thankyou for sharing.');
 
 #INSERT Reshares
 INSERT INTO Reshares(UserId,PostId,CommentId)
-VALUES('5','1','1');
-INSERT INTO Reshares(UserId,PostId,CommentId)
-VALUES('1','3','1');
+VALUES('5',,'1');
 
 #INSERT Participates
 INSERT INTO Participates(SiteId,ResearcherId)
