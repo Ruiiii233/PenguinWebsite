@@ -1,4 +1,4 @@
-USE PenguinWebsite;
+USE PenguinWeb;
 
 LOAD DATA INFILE '/home/jeoker/Documents/database/project/PenguinWebsite/data/camera.csv'
   INTO TABLE Cameras
@@ -97,8 +97,10 @@ INSERT INTO Comments(UserId,PostId,Content)
 VALUES('3','2','Thankyou for sharing.');
 
 #INSERT Reshares
-INSERT INTO Reshares(UserId,PostId,CommentId)
-VALUES('5',,'1');
+INSERT INTO Reshares(UserId,CommentId)
+VALUES('5','1');
+INSERT INTO Reshares(UserId,PostId)
+VALUES('5','1');
 
 #INSERT Participates
 INSERT INTO Participates(SiteId,ResearcherId)
