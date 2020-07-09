@@ -18,36 +18,36 @@ group by user.userkey, user.username;
 
 
 # 3.what is the image count of each site and Date?
-SELECT name, Date, COUNT_SITE
-FROM Site INNER JOIN
+SELECT Name, Date, COUNT_SITE
+FROM Sites INNER JOIN
      (
-         SELECT siteID, COUNT(*) AS COUNT_SITE
-         FROM Image
-         GROUP BY siteID
-         ORDER BY siteID ASC
+         SELECT SiteId, COUNT(*) AS COUNT_SITE
+         FROM Images
+         GROUP BY SiteId
+         ORDER BY SiteId ASC
      ) AS siteID_COUNT
-     ON Site.idSite = siteID
-ORDER BY name ASC;
+     ON Sites.SiteId = SiteId
+ORDER BY Name ASC;
 
 # 4.what is the researchers' journey site and datetime?
-SELECT  idParticipate AS journey, Site.name AS siteName, Date, FirstName AS reseacher_FirstName, LastName AS reseacher_LastName
+SELECT  ParticipateId AS journey, Sites.Name AS siteName, Date, FirstName AS reseacher_FirstName, LastName AS reseacher_LastName
 FROM
-    (Participate inner join Site
-        ON Participate.idParticipate = site.idSite)
+    (Participates inner join Sites
+        ON Participates.ParticipateId = site.SiteId)
         INNER JOIN Researcher
-                   ON Participate.researcherKeyFK = Researcher.ResearcherKey;
+                   ON Participates.researcherKeyFK = Researcher.ResearcherKey;
 
 # 5.How many image is taken by camera "FC300X" ?
 SELECT COUNT(*) AS COUNT_SITE
-FROM Image INNER JOIN Camera
-                      ON Image.camID = Camera.idCamera
-WHERE Camera.name = "FC300X";
+FROM Images INNER JOIN Cameras
+                      ON Images.camID = Cameras.CameraId
+WHERE Cameras.Name = "FC300X";
 
-# 6. What is UAV of each Camera ?
-SELECT name, model, weight
-FROM Camera LEFT OUTER JOIN UAV
-                            ON Camera.idCamera = UAV.camID
-ORDER BY Camera.idCamera ASC;
+# 6. What is UAVs of each camera ?
+SELECT Name, Model, Weight
+FROM Cameras LEFT OUTER JOIN UAVs
+                            ON Cameras.CameraId = UAVs.camID
+ORDER BY Cameras.CameraId ASC;
 
 
 
@@ -97,13 +97,13 @@ GROUP  BY PostKeyFK
 ORDER  BY POPULARITY
 LIMIT  10;
 
-/* 11. link each image to the weather record, where the weather station is closest and time matches best */
-select idWeather, time as weather_time, Weather.longitude as weather_long, Weather.latitude as weather_latt, idImage, timestamp as image_time, the_image.longitude as image_long, the_image.latitude as image_latt,
-       abs(round(6367000*2*asin(sqrt(pow(sin(((Weather.latitude * pi())/180-(the_image.latitude*pi())/180)/2),2) + cos((the_image.Latitude*pi())/180)*cos((Weather.latitude*pi())/180)*pow(sin(((Weather.longitude*pi())/180-(the_image.longitude * pi())/180)/2), 2))))) as distance
-from Weather, (select * from Image where idImage = 5410) as the_image
-where the_image.latitude is not null and
-      the_image.longitude is not null and
-      the_image.timestamp is not null
-order by distance, abs(the_image.timestamp-Weather.time)
+/* 11. link each image to the weather record, where the weather station is closest and Time matches best */
+select WeatherId, Time as weather_time, Weathers.Longitude as weather_long, Weathers.Latitude as weather_latt, ImageId, TimeStamp as image_time, the_image.Longitude as image_long, the_image.Latitude as image_latt,
+       abs(round(6367000*2*asin(sqrt(pow(sin(((Weathers.Latitude * pi())/180-(the_image.Latitude*pi())/180)/2),2) + cos((the_image.Latitude*pi())/180)*cos((Weathers.Latitude*pi())/180)*pow(sin(((Weathers.Longitude*pi())/180-(the_image.Longitude * pi())/180)/2), 2))))) as distance
+from Weathers, (select * from Images where ImageId = 5410) as the_image
+where the_image.Latitude is not null and
+      the_image.Longitude is not null and
+      the_image.TimeStamp is not null
+order by distance, abs(the_image.TimeStamp-Weathers.Time)
 limit 1;
 
