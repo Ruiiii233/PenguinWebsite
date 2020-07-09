@@ -248,7 +248,8 @@ CREATE TABLE IF NOT EXISTS `PenguinWeb`.`Images` (
     REFERENCES `PenguinWeb`.`Cameras` (`CameraId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
-  CONSTRAINT `SiteId`
+  INDEX `SiteId1_idx` (`SiteId` ASC),
+  CONSTRAINT `SiteId1`
     FOREIGN KEY (`SiteId`)
     REFERENCES `PenguinWeb`.`Sites` (`SiteId`)
     ON DELETE SET NULL
@@ -316,7 +317,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `PenguinWeb`.`Detections` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Detections` (
+CREATE TABLE IF NOT EXISTS `PenguinWeb`.`Detections` (
   `DetectionId` INT NOT NULL AUTO_INCREMENT,
   `ImageId` INT NOT NULL,
   `Count` INT NOT NULL,
@@ -341,9 +342,9 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `PenguinWebsite`.`Participates`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Participates` ;
+DROP TABLE IF EXISTS `PenguinWeb`.`Participates` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Participates` (
+CREATE TABLE IF NOT EXISTS `PenguinWeb`.`Participates` (
   `ParticipateId` INT NOT NULL AUTO_INCREMENT,
   `SiteId` INT NULL,
   `ResearcherId` INT NULL,
@@ -352,12 +353,12 @@ CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Participates` (
   INDEX `Participate_Researcher_fk_idx` (`ResearcherId` ASC) VISIBLE,
   CONSTRAINT `fk_Participate_Site`
     FOREIGN KEY (`SiteId`)
-    REFERENCES `PenguinWebsite`.`Sites` (`SiteId`)
+    REFERENCES `PenguinWeb`.`Sites` (`SiteId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   CONSTRAINT `Participate_Researcher_fk`
     FOREIGN KEY (`ResearcherId`)
-    REFERENCES `PenguinWebsite`.`Researchers` (`UserId`)
+    REFERENCES `PenguinWeb`.`Researchers` (`UserId`)
     ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -366,9 +367,9 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `PenguinWebsite`.`Weathers`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PenguinWebsite`.`Weathers` ;
+DROP TABLE IF EXISTS `PenguinWeb`.`Weathers` ;
 
-CREATE TABLE IF NOT EXISTS `PenguinWebsite`.`Weathers` (
+CREATE TABLE IF NOT EXISTS `PenguinWeb`.`Weathers` (
   `WeatherId` INT NOT NULL AUTO_INCREMENT,
   `Time` DATETIME NULL,
   `TmpOut` FLOAT NULL,
