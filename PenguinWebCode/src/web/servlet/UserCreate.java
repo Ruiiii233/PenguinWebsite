@@ -8,14 +8,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet("/userlogin")
-public class UserLogin extends HttpServlet {
+@WebServlet("/usercreate")
+public class UserCreate extends HttpServlet {
     protected UsersDao usersDao;
 
     @Override
@@ -30,7 +29,7 @@ public class UserLogin extends HttpServlet {
         Map<String, String> messages = new HashMap<String, String>();
         req.setAttribute("messages", messages);
         //Just render the JSP.
-        req.getRequestDispatcher("/Login.jsp").forward(req, resp);
+        req.getRequestDispatcher("/SignUp.jsp").forward(req,resp);
     }
 
     @Override
@@ -40,28 +39,20 @@ public class UserLogin extends HttpServlet {
         Map<String, String> messages = new HashMap<String, String>();
         req.setAttribute("messages", messages);
 
+        // Retrieve/Validate username and password.
         String userName = req.getParameter("username");
         String password = req.getParameter("password");
-        String status = req.getParameter("status");
         if(userName == null || userName.trim().isEmpty() ||
-                password == null || password.trim().isEmpty() ||
-                status == null || status.trim().isEmpty()){
-            messages.put("login", "Invalid UserName Or Password Or Status");
+                password == null || password.trim().isEmpty()){
+            messages.put("signUp", "Invalid UserName Or Password");
+            req.getRequestDispatcher("/SignUp.jsp").forward(req,resp);
         }else {
+            String status = req.getParameter("status");
             try {
                 Users user = new Users(userName,password,Users.Status.valueOf(status));
-                Users resultUser = usersDao.getUserByUserNamePasswordStatus(user);
-                if (resultUser != null){
-                    messages.put("login", "Login Successful");
-                    if(user.getStatus().name().equals("User")){
-                        HttpSession session = req.getSession();
-                        session.setAttribute("user",resultUser);
-                        req.getRequestDispatcher("/UserMyProfile.jsp").forward(req,resp);
-                    }
-                }else {
-                    messages.put("login", "Incorrect UserName Or Password Or Status");
-                    req.getRequestDispatcher("/Login.jsp").forward(req,resp);
-                }
+                usersDao.create(user);
+                messages.put("signUp", "Sign Up Successful");
+                req.getRequestDispatcher("/index.jsp").forward(req,resp);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

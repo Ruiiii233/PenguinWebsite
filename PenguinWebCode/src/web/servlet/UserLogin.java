@@ -8,7 +8,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -53,18 +52,14 @@ public class UserLogin extends HttpServlet {
                 Users resultUser = usersDao.getUserByUserNamePasswordStatus(user);
                 if (resultUser != null){
                     messages.put("login", "Login Successful");
-                    if(user.getStatus().name().equals("User")){
-                        HttpSession session = req.getSession();
-                        session.setAttribute("user",resultUser);
-                        req.getRequestDispatcher("/UserMyProfile.jsp").forward(req,resp);
-                    }
+                    //req.getRequestDispatcher("/index.jsp").forward(req,resp);
                 }else {
                     messages.put("login", "Incorrect UserName Or Password Or Status");
-                    req.getRequestDispatcher("/Login.jsp").forward(req,resp);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+        req.getRequestDispatcher("/Login.jsp").forward(req,resp);
     }
 }

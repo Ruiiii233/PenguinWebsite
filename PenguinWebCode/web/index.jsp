@@ -18,19 +18,24 @@
 
   <h1>Post</h1>
     <div><a href="allpost">Post</a></div><br/>
-
+    <table border="1">
+      <tr>
+        <th>PostId</th>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Published</th>
+        <th>Created</th>
+      </tr>
       <c:forEach items="${allPosts}" var="post" >
         <div>
           <div><c:out value="${post.getTitle()}" /></div>
           <div><c:out value="${post.getContent()}" /></div>
-          <div><c:if test="${post.getPicture() != null}">
-            <img src="${post.getPicture()}" width="100px">
-          </c:if></div>
+          <div><c:out value="${post.getPicture()}" /></div>
+          <div><img src="image/1.jpg" width="100px"></div>
           <div><fmt:formatDate value="${post.getCreated()}" pattern="MM-dd-yyyy hh:mm:sa"/></div>
-          <div><a href="NewPost.jsp"><input type="button" value="comment"></a></div>
-          ---------------------------------
         </div>
       </c:forEach>
+    </table>
   </center>
   </body>
 </html>

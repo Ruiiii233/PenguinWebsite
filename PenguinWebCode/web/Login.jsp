@@ -24,7 +24,7 @@
                     <select name="status">
                         <option value="User" selected>User</option>
                         <option value="Researcher">Researcher</option>
-                        <option value="Administrator">Administrator</option>
+                        <option value="Administrator" selected>Administrator</option>
                     </select>
                 </td>
             </tr>
